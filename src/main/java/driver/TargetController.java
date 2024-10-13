@@ -2,6 +2,8 @@ package driver;
 
 import com.fazecast.jSerialComm.*;
 
+import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -362,6 +364,30 @@ public class TargetController {
         }
         printDebug("< Send APDU OK\n");
         return response;
+    }
+
+    public ResponseAPDU sendAPDU(CommandAPDU commandApdu) {
+        printDebug("> Send APDU\n");
+        APDU apdu = new APDU((byte) commandApdu.getCLA(), (byte) commandApdu.getINS(), (byte) commandApdu.getP1(),
+                (byte) commandApdu.getP2(), commandApdu.getData());
+        RESP response = new RESP(); //  for unpacking the answer data
+        ResponseAPDU responseApdu; // for return
+        synchronized (lock) {
+            System.out.println("APDU: " + apdu);
+            sendCommand("a".getBytes(), apdu);
+            int resSize = this.readResponseSize();
+            if (resSize < 14)
+                throw new RuntimeException("Unexpected response size! Cannot parse ATR.");
+            byte[] responseBytes = new byte[resSize];
+            serialPort.readBytes(responseBytes, resSize);
+            response.unpack(responseBytes);
+
+            // copy into ResponseAPDU
+            responseApdu = new ResponseAPDU(response.toArray());
+            System.out.println("RES: " + response);
+        }
+        printDebug("< Send APDU OK\n");
+        return responseApdu;
     }
 
     /**

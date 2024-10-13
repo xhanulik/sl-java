@@ -35,6 +35,24 @@ public class APDU extends DataStructure {
         }
     }
 
+    public APDU(byte cla, byte ins, byte p1, byte p2, byte[] data) {
+        this.cla = cla;
+        this.ins = ins;
+        this.p1 = p1;
+        this.p2 = p2;
+        this.le = 0;
+        this.sendLe = 0;
+
+        if (data == null) {
+            this.data = new byte[0];
+            this.lc = 0;
+        } else {
+            // copy only maximal portion of data
+            this.data = Arrays.copyOf(data, Math.min(data.length, MAX_APDU_PAYLOAD_SIZE));
+            this.lc = (short) data.length;
+        }
+    }
+
     public static byte[] hexStringToByteArray(String hex) {
         int len = hex.length();
         byte[] data = new byte[len / 2];

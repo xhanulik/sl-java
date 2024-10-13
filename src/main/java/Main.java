@@ -1,9 +1,10 @@
 import driver.ATR;
 import driver.ConfigureSmartcardCommand;
 import driver.TargetController;
-import filter.LowPassFilter;
 import oscilloscope.AbstractOscilloscope;
 
+import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -17,9 +18,9 @@ public class Main {
         Path resultCSV = Paths.get("./measurements.csv");
         try {
             // PicoScope start
-            oscilloscope = AbstractOscilloscope.create();
-            oscilloscope.setup();
-            oscilloscope.startMeasuring();
+//            oscilloscope = AbstractOscilloscope.create();
+//            oscilloscope.setup();
+//            oscilloscope.startMeasuring();
 
             // Leia code
             target = new TargetController();
@@ -32,7 +33,9 @@ public class Main {
             ATR atr = target.getATR();
             System.out.printf("We are using protocol T=%d and the frequency of the ISO7816 clock is %d kHz !\n", atr.tProtocolCurr, atr.fMaxCurr / 1000);
             target.resetTriggerStrategy();
-            target.sendAPDU("00A404000712345678900101");
+
+            CommandAPDU apdu = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, new byte[]{0x12, 0x34, 0x56, 0x78, (byte)0x90, 0x01, 0x01});
+            ResponseAPDU res = target.sendAPDU(apdu);
             target.sendAPDU("00010202620155389167c900028a37a264541ae18c5733902c0b51d7665ed41afe6788fe9fba042b32ab827bdffa6f63ccf9f27b1d03017f4f5d909c13294e8a4c389d3f57373f767033b8932942aded1a0ec48d9a1e1d26fb1eec023f74aa48f6a891e73076ca");
             target.sendAPDU("0002400042035963fbaa2b953f2aec5fee0d9c926f9d1b65d5e150445fbe21ba437c602544d7111963fbaa2b953f2aec5fee0d9c926f9d1b65d5e150445fbe21ba437c60254111");
             target.sendAPDU("000301008204e6d003a2ed575e28d6b3a195d5e3d4c0548e6438c7f179f7b940c856358d52fa145d0e25d5883c8c96f1b0a1688ad6a610e6a6e40979ade049dc834de4340c2d04ebbf9f544b880466ee7168f8e8725d7401a1a6af80270fd033a5fda75935ae0c4802c67865d8de591e008032d88852a2bfb0259afeab9151a8c2482dd358ec0e");
@@ -43,8 +46,8 @@ public class Main {
             // Leia code end
 
             // PicoScope store and close
-            oscilloscope.store(resultCSV, 5000);
-            oscilloscope.finish();
+//            oscilloscope.store(resultCSV, 5000);
+//            oscilloscope.finish();
 
             // Leia close
             target.close();

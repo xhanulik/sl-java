@@ -48,4 +48,12 @@ public class RESP extends DataStructure {
     public String toString() {
         return bytesToHex(data) + String.format("%02X", sw1) + String.format("%02X", sw2);
     }
+
+    public byte[] toArray() {
+        byte[] result = new byte[data.length + 2];
+        System.arraycopy(data, 0, result, 0, data.length);
+        result[data.length] = sw1;
+        result[data.length + 1] = sw2;
+        return result;
+    }
 }

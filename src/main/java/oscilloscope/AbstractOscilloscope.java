@@ -1,7 +1,6 @@
 package oscilloscope;
 
 
-import filter.LowPassFilter;
 import oscilloscope.drivers.PicoScope4000Driver;
 import oscilloscope.drivers.PicoScope6000Driver;
 

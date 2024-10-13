@@ -5,13 +5,9 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
-import filter.LowPassFilter;
 import oscilloscope.AbstractOscilloscope;
 import oscilloscope.drivers.libraries.PicoScope4000Library;
-import oscilloscope.drivers.libraries.PicoScope6000Library;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 

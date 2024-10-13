@@ -1,4 +1,4 @@
-package filter;
+package oscilloscope;
 
 import uk.me.berndporr.iirj.Butterworth;
 
