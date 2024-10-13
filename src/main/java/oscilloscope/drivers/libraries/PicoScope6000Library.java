@@ -7,11 +7,12 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
 
 public interface PicoScope6000Library extends Library {
-    PicoScope6000Library INSTANCE = (PicoScope6000Library) Native.load(
+    PicoScope6000Library INSTANCE = Native.load(
             "ps6000", PicoScope6000Library.class
     );
+    int PS6000_OK = 0x00000000;
 
-    int PS6000_MAX_VALUE = 32512;
+    int PS6000_BW_25MHZ = 2;
 
     int ps6000OpenUnit(ShortByReference handle, String serial);
 
@@ -61,18 +62,6 @@ public interface PicoScope6000Library extends Library {
         PS6000_MAX_RANGES
     }
 
-    enum PicoScope6000TimeUnits {
-        PS6000_FS,
-        PS6000_PS,
-        PS6000_NS,
-        PS6000_US,
-        PS6000_MS,
-        PS6000_S,
-        PS6000_MAX_TIME_UNITS,
-    }
-
-    final int PS6000_OK = 0x00000000;
-
     enum PicoScope6000ThresholdDirection {
         PS6000_ABOVE,             //using upper threshold
         PS6000_BELOW,							// using upper threshold
@@ -85,7 +74,4 @@ public interface PicoScope6000Library extends Library {
         PS6000_DC_1M,
         PS6000_DC_50R
     }
-
-    int PICO_VARIANT_INFO = 3;
-    int PS6000_BW_25MHZ = 2;
 }
