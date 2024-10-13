@@ -52,7 +52,7 @@ public class Main {
             if (target != null)
                 target.close();
             if (oscilloscope != null)
-                oscilloscope.stopDevice();
+                oscilloscope.finish();
             System.out.println("Caught exception:");
             System.out.println(e.getMessage());
         }

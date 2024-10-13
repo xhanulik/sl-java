@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class TargetController {
 
-    final private boolean DEBUG = true;
+    final private boolean DEBUG = false;
     final int RESPONSE_LEN_SIZE = 4;
     final int COMMAND_LEN_SIZE = 4;
     private SerialPort serialPort = null;
@@ -238,7 +238,7 @@ public class TargetController {
             throw new RuntimeException("Unexpected bytes for response size! " + readBytes);
         // Omit creation of response size struct as in python
         int result = ByteBuffer.wrap(response).order(ByteOrder.LITTLE_ENDIAN).getInt();
-        System.out.printf("Response size is %d\n", result);
+        printDebug("Response size is %d\n", result);
         printDebug("< Read response size OK\n");
         return result;
     }
