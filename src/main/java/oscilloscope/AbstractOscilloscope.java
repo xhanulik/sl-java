@@ -1,8 +1,11 @@
 package oscilloscope;
 
 
+import filter.LowPassFilter;
+import oscilloscope.drivers.PicoScope4000Driver;
 import oscilloscope.drivers.PicoScope6000Driver;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,11 +13,13 @@ import java.nio.file.Path;
 
 public abstract class AbstractOscilloscope {
     final private boolean DEBUG = false;
+    protected int PICO_VARIANT_INFO = 3;
 
     /**
      * Array of implemented oscilloscope drivers
      */
     static Class<?>[] oscilloscopeDrivers = {
+            PicoScope4000Driver.class,
             PicoScope6000Driver.class
     };
 
@@ -48,6 +53,37 @@ public abstract class AbstractOscilloscope {
             voltages[i] = (adcValues[i] / (double) maxAdcValue) * voltageRange;
         }
         return voltages;
+    }
+
+    protected static int getSamplingFrequency(int timeIntervalNs) {
+        return (int) (1 / (timeIntervalNs / 1_000_000_000.0));
+    }
+
+    protected void writeIntoCSV(double[] voltValues, int sampleNumber, Path filePath, int cutOffFrequency, int timeInterval) {
+        int samplingFrequency = getSamplingFrequency(timeInterval);
+        LowPassFilter filter = null;
+
+        if (cutOffFrequency > 0)
+            filter = new LowPassFilter(samplingFrequency, cutOffFrequency);
+
+        // Write into CSV file
+        try (FileWriter writer = new FileWriter(filePath.toAbsolutePath().toFile())) {
+            writer.append("Time,Channel\n");
+            writer.append("(ms),(V)\n");
+            writer.append(",\n");
+
+            for (int i = 0; i < sampleNumber; i++) {
+                if (filter != null)
+                    writer.append(String.format("%9f,%.9f\n", (i * timeInterval) / 1e6, filter.applyLowPassFilter(voltValues[i])));
+                else
+                    writer.append(String.format("%9f,%.9f\n", (i * timeInterval) / 1e6, voltValues[i]));
+            }
+
+            System.out.println("Data has been written to " + filePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Writing into CSV failed");
+        }
     }
 
     /**
